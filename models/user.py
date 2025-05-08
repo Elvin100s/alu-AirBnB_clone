@@ -1,21 +1,16 @@
 #!/usr/bin/python3
-"""
-User class implementation for AirBnB clone
-Simple FileStorage version for validator compliance
-"""
-
+"""Defines the User class"""
 from models.base_model import BaseModel
 
 
 class User(BaseModel):
-    """
-    User class with authentication attributes
+    """User class for authentication system
     
     Attributes:
-        email (str): User's email address (empty string by default)
-        password (str): User's password (empty string)
-        first_name (str): User's first name
-        last_name (str): User's last name
+        email (str): empty string
+        password (str): empty string
+        first_name (str): empty string
+        last_name (str): empty string
     """
     email = ""
     password = ""
@@ -23,10 +18,5 @@ class User(BaseModel):
     last_name = ""
 
     def __init__(self, *args, **kwargs):
-        """
-        Initializes User instance
-        Args:
-            *args: Variable length argument list
-            **kwargs: Arbitrary keyword arguments
-        """
+        """Initialize User instance"""
         super().__init__(*args, **kwargs)
