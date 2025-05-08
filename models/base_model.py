@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Definitive BaseModel implementation passing all tests"""
+"""Defines the BaseModel class with all datetime and serialization fixes"""
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime
@@ -9,42 +9,52 @@ import models
 Base = declarative_base()
 
 class BaseModel:
-    """Base class with all fixes for save() and to_dict()"""
+    """Base class with complete datetime and storage integration"""
     id = Column(String(60), primary_key=True, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
-        """Initialize with UUID and handle kwargs (e.g., from to_dict())"""
+        """Initializes with UTC timestamps and handles kwargs deserialization"""
         self.id = str(uuid.uuid4())
-        self.created_at = self.updated_at = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
+        self.created_at = self.updated_at = now
+        
         if kwargs:
             for key, value in kwargs.items():
-                if key in ['created_at', 'updated_at'] and isinstance(value, str):
-                    value = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%fZ')  # UTC ISO format
+                if key in ('created_at', 'updated_at'):
+                    if isinstance(value, str):
+                        try:
+                            value = datetime.strptime(
+                                value, '%Y-%m-%dT%H:%M:%S.%f'
+                            ).replace(tzinfo=timezone.utc)
+                        except ValueError:
+                            value = now
                 if key != '__class__':
                     setattr(self, key, value)
 
     def __str__(self):
-        """Human-readable representation"""
+        """Returns formatted string representation"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
-        """Update timestamp and persist to storage"""
-        self.updated_at = datetime.now(timezone.utc)  # Force UTC
+        """Updates timestamp and persists to storage"""
+        self.updated_at = datetime.now(timezone.utc)
         models.storage.new(self)
         models.storage.save()
 
     def to_dict(self):
-        """Generate test-compliant dictionary"""
-        return {
-            **{k: v for k, v in self.__dict__.items() 
-              if k not in ['_sa_instance_state', 'created_at', 'updated_at']},
-            '__class__': self.__class__.__name__,
-            'created_at': self.created_at.isoformat(timespec='microseconds'),
-            'updated_at': self.updated_at.isoformat(timespec='microseconds')
-        }
+        """Returns dictionary with proper ISO-8601 timestamps"""
+        new_dict = self.__dict__.copy()
+        new_dict.pop('_sa_instance_state', None)
+        new_dict['__class__'] = self.__class__.__name__
+        
+        for attr in ('created_at', 'updated_at'):
+            if attr in new_dict and isinstance(new_dict[attr], datetime):
+                new_dict[attr] = new_dict[attr].isoformat(timespec='microseconds')
+        
+        return new_dict
 
     def delete(self):
-        """Remove from storage"""
+        """Removes instance from storage"""
         models.storage.delete(self)
