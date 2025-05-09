@@ -1,12 +1,8 @@
 #!/usr/bin/python3
-"""This module instantiates an object of class FileStorage"""
-import os
+"""Initialize the models package and create storage instance"""
+from models.engine.file_storage import FileStorage
 
-if os.getenv("HBNB_TYPE_STORAGE") == "db":
-    from models.engine.db_storage import DBStorage
-    storage = DBStorage()
-    storage.reload()
-else:
-    from models.engine.file_storage import FileStorage
-    storage = FileStorage()
-    storage.reload()
+# Create a unique FileStorage instance for the application
+storage = FileStorage()
+# Load all objects from the JSON file at startup
+storage.reload()
