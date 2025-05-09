@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-"""Console module for basic command interpreter"""
+"""Command interpreter for HBNB project"""
 import cmd
 
-
 class HBNBCommand(cmd.Cmd):
-    """Simple command processor example."""
+    """Custom command interpreter class"""
     
     prompt = '(hbnb) '
 
@@ -13,14 +12,13 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def do_EOF(self, arg):
-        """EOF command to exit the program"""
-        print()  # New line for clean exit
+        """EOF command to exit the program (Ctrl+D)"""
+        print()  # Ensure clean exit with newline
         return True
 
     def emptyline(self):
-        """Do nothing on empty line"""
+        """Handles empty line + ENTER and empty line + spaces + ENTER"""
         pass
-
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
