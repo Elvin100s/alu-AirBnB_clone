@@ -1,39 +1,64 @@
-"""Persistent JSON storage engine"""
+#!/usr/bin/python3
+"""
+Module for FileStorage class that handles object serialization and deserialization
+"""
 import json
-from datetime import datetime, timezone
-from models.base_model import BaseModel
+import os
+from datetime import datetime
+
 
 class FileStorage:
+    """
+    FileStorage class for serializing instances to JSON file
+    and deserializing JSON file to instances
+    """
+    # Path to the JSON file
     __file_path = "file.json"
+    # Dictionary that will store all objects by <class name>.id
     __objects = {}
 
     def all(self):
-        """Return all stored objects"""
+        """Returns the dictionary __objects"""
         return self.__objects
 
     def new(self, obj):
-        """Add object with key format <class name>.<id>"""
-        key = f"{obj.__class__.__name__}.{obj.id}"
+        """Sets in __objects the obj with key <obj class name>.id"""
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
         self.__objects[key] = obj
 
     def save(self):
-        """Serialize objects to JSON file with ISO datetime strings"""
-        serialized = {k: v.to_dict() for k, v in self.__objects.items()}
-        with open(self.__file_path, 'w', encoding='utf-8') as f:
-            json.dump(serialized, f)
+        """Serializes __objects to the JSON file (path: __file_path)"""
+        serialized = {}
+        for key, obj in self.__objects.items():
+            serialized[key] = obj.to_dict()
+        
+        with open(self.__file_path, 'w', encoding='utf-8') as file:
+            json.dump(serialized, file)
 
     def reload(self):
-        """Deserialize JSON file to objects with UTC datetime conversion"""
-        try:
-            with open(self.__file_path, 'r', encoding='utf-8') as f:
-                obj_dict = json.load(f)
-                for key, val in obj_dict.items():
-                    cls_name = val.pop('__class__')
-                    for time_attr in ['created_at', 'updated_at']:
-                        if time_attr in val:
-                            val[time_attr] = datetime.strptime(
-                                val[time_attr], '%Y-%m-%dT%H:%M:%S.%f'
-                            ).replace(tzinfo=timezone.utc)
-                    self.__objects[key] = eval(cls_name)(**val)
-        except (FileNotFoundError, json.JSONDecodeError, KeyError):
-            pass
+        """
+        Deserializes the JSON file to __objects
+        Only if the JSON file exists; otherwise, do nothing.
+        No exception should be raised if the file doesn't exist.
+        """
+        # Import here to avoid circular import
+        from models.base_model import BaseModel
+        
+        # Dictionary of supported classes
+        classes = {
+            'BaseModel': BaseModel
+        }
+        
+        # Check if file exists
+        if os.path.isfile(self.__file_path):
+            try:
+                with open(self.__file_path, 'r', encoding='utf-8') as file:
+                    data = json.load(file)
+                    for key, value in data.items():
+                        class_name = value["__class__"]
+                        if class_name in classes:
+                            # Recreate the instance using the dictionary
+                            self.__objects[key] = classes[class_name](**value)
+            except Exception:
+                # If any error occurs, do nothing as per requirements
+                pass
