@@ -1,64 +1,70 @@
 #!/usr/bin/python3
-"""
-Module for FileStorage class that handles object serialization and deserialization
-"""
+"""This module defines a class to manage file storage for hbnb clone"""
 import json
-import os
-from datetime import datetime
 
 
 class FileStorage:
-    """
-    FileStorage class for serializing instances to JSON file
-    and deserializing JSON file to instances
-    """
-    # Path to the JSON file
-    __file_path = "file.json"
-    # Dictionary that will store all objects by <class name>.id
+    """This class manages storage of hbnb models in JSON format"""
+    __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
-        """Returns the dictionary __objects"""
-        return self.__objects
+    def all(self, cls=None):
+        """Returns a dictionary of models currently in storage"""
+        if cls:
+            temp = {}
+            for key, val in self.__objects.items():
+                if cls == val.__class__ or cls == val.__class__.__name__:
+                    temp[key] = val
+            return temp
+        return FileStorage.__objects
 
     def new(self, obj):
-        """Sets in __objects the obj with key <obj class name>.id"""
-        key = "{}.{}".format(obj.__class__.__name__, obj.id)
-        self.__objects[key] = obj
+        """Adds new object to storage dictionary"""
+        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
-        """Serializes __objects to the JSON file (path: __file_path)"""
-        serialized = {}
-        for key, obj in self.__objects.items():
-            serialized[key] = obj.to_dict()
-        
-        with open(self.__file_path, 'w', encoding='utf-8') as file:
-            json.dump(serialized, file)
+        """Saves storage dictionary to file"""
+        with open(FileStorage.__file_path, 'w') as f:
+            temp = {}
+            temp.update(FileStorage.__objects)
+            for key, val in temp.items():
+                temp[key] = val.to_dict()
+            json.dump(temp, f)
 
     def reload(self):
-        """
-        Deserializes the JSON file to __objects
-        Only if the JSON file exists; otherwise, do nothing.
-        No exception should be raised if the file doesn't exist.
-        """
-        # Import here to avoid circular import
+        """Loads storage dictionary from file"""
         from models.base_model import BaseModel
-        
-        # Dictionary of supported classes
+        from models.user import User
+        from models.place import Place
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.review import Review
+
         classes = {
-            'BaseModel': BaseModel
-        }
-        
-        # Check if file exists
-        if os.path.isfile(self.__file_path):
-            try:
-                with open(self.__file_path, 'r', encoding='utf-8') as file:
-                    data = json.load(file)
-                    for key, value in data.items():
-                        class_name = value["__class__"]
-                        if class_name in classes:
-                            # Recreate the instance using the dictionary
-                            self.__objects[key] = classes[class_name](**value)
-            except Exception:
-                # If any error occurs, do nothing as per requirements
-                pass
+                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+                    'State': State, 'City': City, 'Amenity': Amenity,
+                    'Review': Review
+                  }
+        try:
+            temp = {}
+            with open(FileStorage.__file_path, 'r') as f:
+                temp = json.load(f)
+                for key, val in temp.items():
+                    self.all()[key] = classes[val['__class__']](**val)
+        except FileNotFoundError:
+            pass
+
+    def delete(self, obj=None):
+        """Deletes obj from __objects if it's inside"""
+        if obj:
+            key = obj.__class__.__name__ + '.' + obj.id
+            if key in self.all():
+                del self.all()[key]
+            self.save()
+        else:
+            pass
+
+    def close(self):
+        """call reload() method for deserializing the JSON file to objects"""
+        self.reload()
