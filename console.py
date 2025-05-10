@@ -5,7 +5,6 @@ import cmd
 
 class HBNBCommand(cmd.Cmd):
     """Command interpreter class for AirBnB clone."""
-
     prompt = '(hbnb) '
 
     def emptyline(self):
@@ -13,18 +12,11 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_quit(self, arg):
-        """Quit command to exit the program.
-        
-        Usage: quit
-        """
+        """Quit command to exit the program."""
         return True
 
     def do_EOF(self, arg):
-        """EOF command to exit the program.
-        
-        Usage: Ctrl+D (Unix) or Ctrl+Z (Windows)
-        """
-        print()  # Print newline for clean exit
+        """EOF command to exit the program."""
         return True
 
 
