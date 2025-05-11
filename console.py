@@ -14,7 +14,7 @@ from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
-    """Defines the HolbertonBnB command interpreter."""
+    """HolbertonBnB command interpreter."""
 
     prompt = "(hbnb) "
     __classes = {
@@ -28,20 +28,20 @@ class HBNBCommand(cmd.Cmd):
     }
 
     def emptyline(self):
-        """Do nothing on empty input line."""
+        """Ignore empty lines."""
         pass
 
     def do_quit(self, arg):
-        """Quit command to exit the program."""
+        """Exit the program."""
         return True
 
     def do_EOF(self, arg):
-        """EOF signal to exit the program."""
+        """Exit on EOF (Ctrl+D)."""
         print()
         return True
 
     def do_create(self, arg):
-        """Create a new class instance and print its id."""
+        """Create a new instance of a class."""
         args = arg.split()
         if not args:
             print("** class name missing **")
@@ -54,7 +54,7 @@ class HBNBCommand(cmd.Cmd):
         print(new_instance.id)
 
     def do_show(self, arg):
-        """Display the string representation of an instance."""
+        """Print the string representation of an instance."""
         args = arg.split()
         if not args:
             print("** class name missing **")
@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
         print(all_objs[key])
 
     def do_destroy(self, arg):
-        """Delete an instance based on class name and id."""
+        """Delete an instance by class name and id."""
         args = arg.split()
         if not args:
             print("** class name missing **")
@@ -90,10 +90,10 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
         del all_objs[key]
-        storage.save()
+        storage.save()  # Critical: Ensure changes persist
 
     def do_all(self, arg):
-        """Display all instances or all instances of a class."""
+        """Print all instances (optionally filtered by class)."""
         args = arg.split()
         all_objs = storage.all()
         if not args:
@@ -106,7 +106,7 @@ class HBNBCommand(cmd.Cmd):
               if key.split('.')[0] == args[0]])
 
     def do_update(self, arg):
-        """Update an instance by adding or updating an attribute."""
+        """Update an instance's attribute."""
         args = shlex.split(arg)
         if not args:
             print("** class name missing **")
@@ -131,6 +131,7 @@ class HBNBCommand(cmd.Cmd):
         obj = all_objs[key]
         attr_name = args[2]
         attr_value = args[3]
+        # Convert attr_value to correct type (e.g., int, float, or str)
         try:
             attr_value = eval(attr_value)
         except (NameError, SyntaxError):
@@ -139,7 +140,7 @@ class HBNBCommand(cmd.Cmd):
         obj.save()
 
     def default(self, arg):
-        """Handle custom commands like <class>.all(), <class>.count()."""
+        """Handle advanced commands like <class>.all()."""
         methods = {
             "all": self.do_all,
             "count": self.do_count,
@@ -170,7 +171,7 @@ class HBNBCommand(cmd.Cmd):
             return methods[method_name](f"{class_name} {' '.join(args)}")
 
     def do_count(self, arg):
-        """Count the number of instances of a class."""
+        """Count instances of a class."""
         args = arg.split()
         if not args:
             print("** class name missing **")
