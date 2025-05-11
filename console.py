@@ -131,7 +131,6 @@ class HBNBCommand(cmd.Cmd):
         obj = all_objs[key]
         attr_name = args[2]
         attr_value = args[3]
-        # Convert attr_value to correct type (e.g., int, float, or str)
         try:
             attr_value = eval(attr_value)
         except (NameError, SyntaxError):
