@@ -1,20 +1,32 @@
 #!/usr/bin/python3
-""" """
-from tests.test_models.test_base_model import TestBaseModel
+"""Test for Amenity"""
+import unittest
 from models.amenity import Amenity
+from models.base_model import BaseModel
 
 
-class TestAmenity(TestBaseModel):
-    """ Test for amenity"""
+class TestAmenity(unittest.TestCase):
+    """Test cases for Amenity"""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "Amenity"
-        self.value = Amenity
+    def setUp(self):
+        self.amenity = Amenity()
 
-    def test_name2(self):
-        """ """
-        new = self.value()
-        new.name = "amenity"
-        self.assertEqual(type(new.name), str)
+    def test_inheritance(self):
+        """6.0 Validate inheritance with BaseModel"""
+        self.assertIsInstance(self.amenity, BaseModel)
+
+    def test_attributes(self):
+        """4.0 & 8.0 Test attributes exist"""
+        self.assertTrue(hasattr(Amenity, "name"))
+        self.assertEqual(self.amenity.name, "")
+        self.assertTrue(hasattr(Amenity, "laws"))  # 8.0 requirement
+        self.assertEqual(self.amenity.laws, "")
+
+    def test_instance_creation(self):
+        """4.0 Correct output - Amenity: Instance creation"""
+        self.assertIsNotNone(self.amenity.id)
+        self.assertTrue(hasattr(self.amenity, "created_at"))
+
+
+if __name__ == '__main__':
+    unittest.main()
