@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Defines the HBnB console."""
+"""Defines the HBnB command interpreter."""
 import cmd
 import re
 import shlex
@@ -28,20 +28,20 @@ class HBNBCommand(cmd.Cmd):
     }
 
     def emptyline(self):
-        """Ignore empty lines."""
+        """Do nothing upon receiving an empty line."""
         pass
 
     def do_quit(self, arg):
-        """Exit the program."""
+        """Quit command to exit the program."""
         return True
 
     def do_EOF(self, arg):
-        """Exit on EOF (Ctrl+D)."""
+        """EOF signal to exit the program."""
         print()
         return True
 
     def do_create(self, arg):
-        """Create a new instance of a class."""
+        """Create a new class instance and print its id."""
         args = arg.split()
         if not args:
             print("** class name missing **")
@@ -54,7 +54,7 @@ class HBNBCommand(cmd.Cmd):
         print(new_instance.id)
 
     def do_show(self, arg):
-        """Print the string representation of an instance."""
+        """Display the string representation of an instance."""
         args = arg.split()
         if not args:
             print("** class name missing **")
@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
         print(all_objs[key])
 
     def do_destroy(self, arg):
-        """Delete an instance by class name and id."""
+        """Delete an instance based on class name and id."""
         args = arg.split()
         if not args:
             print("** class name missing **")
@@ -90,10 +90,10 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
         del all_objs[key]
-        storage.save()  # Critical: Ensure changes persist
+        storage.save()
 
     def do_all(self, arg):
-        """Print all instances (optionally filtered by class)."""
+        """Display all instances or all instances of a class."""
         args = arg.split()
         all_objs = storage.all()
         if not args:
@@ -106,7 +106,7 @@ class HBNBCommand(cmd.Cmd):
               if key.split('.')[0] == args[0]])
 
     def do_update(self, arg):
-        """Update an instance's attribute."""
+        """Update an instance by adding or updating an attribute."""
         args = shlex.split(arg)
         if not args:
             print("** class name missing **")
@@ -139,7 +139,7 @@ class HBNBCommand(cmd.Cmd):
         obj.save()
 
     def default(self, arg):
-        """Handle advanced commands like <class>.all()."""
+        """Handle custom commands like <class>.all()."""
         methods = {
             "all": self.do_all,
             "count": self.do_count,
@@ -170,7 +170,7 @@ class HBNBCommand(cmd.Cmd):
             return methods[method_name](f"{class_name} {' '.join(args)}")
 
     def do_count(self, arg):
-        """Count instances of a class."""
+        """Count the number of instances of a class."""
         args = arg.split()
         if not args:
             print("** class name missing **")
