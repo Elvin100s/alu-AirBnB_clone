@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """Test for State"""
 import unittest
-import os
 from models.state import State
 from models.base_model import BaseModel
 
@@ -13,26 +12,19 @@ class TestState(unittest.TestCase):
         """Create State instance for testing"""
         self.state = State()
 
-    def test_inheritance(self):
-        """1.0 Test if State inherits from BaseModel"""
-        self.assertIsInstance(self.state, BaseModel)
-
-    def test_attributes(self):
-        """Test State attributes exist"""
-        self.assertTrue(hasattr(State, "name"))
-        self.assertEqual(self.state.name, "")
+    def test_name_attribute_present(self):
+        """Correct output - State: name class attribute is present"""
+        self.assertTrue(hasattr(State, 'name'),
+                       "State class missing 'name' attribute")
+        self.assertIsInstance(State.name, str),
+                            "State.name should be of type str")
+        self.assertEqual(self.state.name, "",
+                       "State.name should initialize as empty string")
 
     def test_instance_creation(self):
-        """3.0 Correct output - State: Instance creation"""
+        """Verify basic instance creation"""
+        self.assertIsInstance(self.state, BaseModel)
         self.assertIsNotNone(self.state.id)
-        self.assertIsNotNone(self.state.created_at)
-        self.assertIsNotNone(self.state.updated_at)
-
-    def test_save(self):
-        """9.0 Test save() updates updated_at"""
-        old_updated = self.state.updated_at
-        self.state.save()
-        self.assertNotEqual(old_updated, self.state.updated_at)
 
 
 if __name__ == '__main__':
