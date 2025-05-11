@@ -1,38 +1,59 @@
 #!/usr/bin/python3
-""" """
-from tests.test_models.test_base_model import TestBaseModel
+"""Test cases for User class"""
+import unittest
+import os
 from models.user import User
+from models.base_model import BaseModel
+from models import storage
 
 
-class TestUser(TestBaseModel):
-    """ Test for user"""
+class TestUser(unittest.TestCase):
+    """Test cases for User class"""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "User"
-        self.value = User
+    def setUp(self):
+        """Create test instance"""
+        self.user = User()
 
-    def test_first_name(self):
-        """ """
-        new = self.value()
-        new.first_name = "Abissa"
-        self.assertEqual(type(new.first_name), str)
+    def tearDown(self):
+        """Clean up after tests"""
+        try:
+            os.remove("file.json")
+        except FileNotFoundError:
+            pass
+        storage.all().clear()
 
-    def test_last_name(self):
-        """ """
-        new = self.value()
-        new.last_name = "Abissa"
-        self.assertEqual(type(new.last_name), str)
+    def test_inheritance(self):
+        """Test User inherits from BaseModel"""
+        self.assertIsInstance(self.user, BaseModel)
 
-    def test_email(self):
-        """ """
-        new = self.value()
-        new.email = "a.sani@alustudent.com"
-        self.assertEqual(type(new.email), str)
+    def test_attributes(self):
+        """Test default attributes exist and are empty strings"""
+        attrs = ["email", "password", "first_name", "last_name"]
+        for attr in attrs:
+            self.assertTrue(hasattr(User, attr))
+            self.assertEqual(getattr(self.user, attr), "")
 
-    def test_password(self):
-        """ """
-        new = self.value()
-        new.password = "123aashja"
-        self.assertEqual(type(new.password), str)
+    def test_attribute_assignment(self):
+        """Test attribute assignment works correctly"""
+        test_values = {
+            "email": "test@example.com",
+            "password": "secure123",
+            "first_name": "John",
+            "last_name": "Doe"
+        }
+        for attr, value in test_values.items():
+            setattr(self.user, attr, value)
+            self.assertEqual(getattr(self.user, attr), value)
+
+    def test_storage_integration(self):
+        """Test User is properly saved to storage"""
+        self.user.email = "save@test.com"
+        self.user.save()
+        key = f"User.{self.user.id}"
+        self.assertIn(key, storage.all())
+        loaded = storage.all()[key]
+        self.assertEqual(loaded.email, "save@test.com")
+
+
+if __name__ == '__main__':
+    unittest.main()
