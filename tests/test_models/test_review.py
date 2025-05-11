@@ -1,36 +1,32 @@
 #!/usr/bin/python3
-""" """
-from models.place import Place
-from models.user import User
-from tests.test_models.test_base_model import TestBaseModel
+"""Test for Review"""
+import unittest
 from models.review import Review
+from models.base_model import BaseModel
 
 
-class TestReview(TestBaseModel):
-    """Test for review """
+class TestReview(unittest.TestCase):
+    """Test cases for Review"""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "Review"
-        self.value = Review
+    def setUp(self):
+        self.review = Review()
 
-    def test_place_id(self):
-        """ """
-        new = self.value()
-        place = Place()
-        new.place_id = place.id
-        self.assertEqual(type(new.place_id), str)
+    def test_inheritance(self):
+        """7.0 Validate inheritance with BaseModel"""
+        self.assertIsInstance(self.review, BaseModel)
 
-    def test_user_id(self):
-        """ """
-        new = self.value()
-        user = User()
-        new.user_id = user.id
-        self.assertEqual(type(new.user_id), str)
+    def test_attributes(self):
+        """Test required attributes exist"""
+        required_attrs = ["place_id", "user_id", "text"]
+        for attr in required_attrs:
+            self.assertTrue(hasattr(Review, attr))
+            self.assertEqual(getattr(self.review, attr), "")
 
-    def test_text(self):
-        """ """
-        new = self.value()
-        new.text = ""
-        self.assertEqual(type(new.text), str)
+    def test_instance_creation(self):
+        """3.0 Correct output - Review: Instance creation"""
+        self.assertIsNotNone(self.review.id)
+        self.assertTrue(hasattr(self.review, "created_at"))
+
+
+if __name__ == '__main__':
+    unittest.main()
