@@ -1,28 +1,33 @@
 #!/usr/bin/python3
-""" """
-from models.state import State
-from tests.test_models.test_base_model import TestBaseModel
+"""Test for City"""
+import unittest
 from models.city import City
+from models.base_model import BaseModel
 
 
-class TestCity(TestBaseModel):
-    """ Test for city"""
+class TestCity(unittest.TestCase):
+    """Test cases for City"""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "City"
-        self.value = City
+    def setUp(self):
+        self.city = City()
 
-    def test_state_id(self):
-        """ """
-        state = State()
-        new = self.value()
-        new.state_id = state.id
-        self.assertEqual(type(new.state_id), str)
+    def test_inheritance(self):
+        """1.0 Validate inheritance with BaseModel"""
+        self.assertIsInstance(self.city, BaseModel)
 
-    def test_name(self):
-        """ """
-        new = self.value()
-        new.name = "Batch"
-        self.assertEqual(type(new.name), str)
+    def test_attributes(self):
+        """5.0 Test required attributes exist"""
+        required_attrs = ["state_id", "name"]
+        for attr in required_attrs:
+            self.assertTrue(hasattr(City, attr))
+            self.assertEqual(getattr(self.city, attr), "")
+
+    def test_instance_creation(self):
+        """10.0 Correct output - City: Instance creation"""
+        self.assertIsNotNone(self.city.id)
+        self.assertTrue(hasattr(self.city, "created_at"))
+        self.assertTrue(hasattr(self.city, "updated_at"))
+
+
+if __name__ == '__main__':
+    unittest.main()
