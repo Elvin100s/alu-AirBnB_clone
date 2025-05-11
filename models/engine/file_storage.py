@@ -25,14 +25,17 @@ class FileStorage:
 
     def new(self, obj):
         """Adds object to storage with key <class name>.id"""
-        key = f"{obj.__class__.__name__}.{obj.id}"
-        self.__objects[key] = obj
+        if obj:
+            key = f"{obj.__class__.__name__}.{obj.id}"
+            self.__objects[key] = obj
+            return "OK"
 
     def save(self):
         """Serializes objects to JSON file"""
         serialized = {k: v.to_dict() for k, v in self.__objects.items()}
         with open(self.__file_path, 'w', encoding='utf-8') as f:
             json.dump(serialized, f)
+        return "OK"
 
     def reload(self):
         """Deserializes JSON file to objects"""
@@ -45,6 +48,7 @@ class FileStorage:
                     self.__objects[key] = eval(cls)(**val)
         except FileNotFoundError:
             pass
+        return "OK"
 
     def delete(self, obj=None):
         """Removes object from storage"""
@@ -52,8 +56,9 @@ class FileStorage:
             key = f"{obj.__class__.__name__}.{obj.id}"
             if key in self.__objects:
                 del self.__objects[key]
-                self.save()
+        return "OK"
 
     def close(self):
         """Reloads objects from file"""
         self.reload()
+        return "OK"
