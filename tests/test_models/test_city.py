@@ -1,31 +1,32 @@
 #!/usr/bin/python3
-"""Test for Amenity"""
+"""Test for City"""
 import unittest
-from models.amenity import Amenity
+from models.city import City
 from models.base_model import BaseModel
 
 
-class TestAmenity(unittest.TestCase):
-    """Test cases for Amenity"""
+class TestCity(unittest.TestCase):
+    """Test cases for City"""
 
     def setUp(self):
-        self.amenity = Amenity()
+        self.city = City()
 
     def test_inheritance(self):
-        """6.0 Validate inheritance with BaseModel"""
-        self.assertIsInstance(self.amenity, BaseModel)
+        """1.0 Validate inheritance with BaseModel"""
+        self.assertIsInstance(self.city, BaseModel)
 
     def test_attributes(self):
-        """4.0 & 8.0 Test attributes exist"""
-        self.assertTrue(hasattr(Amenity, "name"))
-        self.assertEqual(self.amenity.name, "")
-        self.assertTrue(hasattr(Amenity, "laws"))  # 8.0 requirement
-        self.assertEqual(self.amenity.laws, "")
+        """5.0 Test required attributes exist"""
+        required_attrs = ["state_id", "name"]
+        for attr in required_attrs:
+            self.assertTrue(hasattr(City, attr))
+            self.assertEqual(getattr(self.city, attr), "")
 
     def test_instance_creation(self):
-        """4.0 Correct output - Amenity: Instance creation"""
-        self.assertIsNotNone(self.amenity.id)
-        self.assertTrue(hasattr(self.amenity, "created_at"))
+        """10.0 Correct output - City: Instance creation"""
+        self.assertIsNotNone(self.city.id)
+        self.assertTrue(hasattr(self.city, "created_at"))
+        self.assertTrue(hasattr(self.city, "updated_at"))
 
 
 if __name__ == '__main__':
